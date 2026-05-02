@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Collective — Server Rules</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #0a0a0c;
+      --bg-card: #111116;
+      --bg-card-hover: #16161d;
+      --border: #1e1e28;
+      --border-accent: #2a2a3a;
+      --text-primary: #e8e6f0;
+      --text-secondary: #8a889a;
+      --text-muted: #55536a;
+      --accent: #c9a84c;
+      --accent-dim: #c9a84c33;
+      --accent-glow: #c9a84c18;
+      --red: #d44040;
+      --red-dim: #d4404022;
+      --green: #3dbd5d;
+      --green-dim: #3dbd5d22;
+      --blue: #4a8fd4;
+      --blue-dim: #4a8fd422;
+      --purple: #9b6dd7;
+      --purple-dim: #9b6dd722;
+      --orange: #d4863a;
+      --orange-dim: #d4863a22;
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 400;
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Subtle grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* Top ambient glow */
+    .ambient-glow {
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 500px;
+      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 60px 24px 100px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 64px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .server-tag {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-dim);
+      padding: 6px 16px;
+      border-radius: 2px;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 8vw, 80px);
+      letter-spacing: 6px;
+      line-height: 1;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .header h1 span {
+      color: var(--accent);
+    }
+
+    .header-sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    /* ── Section ── */
+    .rules-section {
+      margin-bottom: 40px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .rules-section:nth-child(2) { animation-delay: 0.05s; }
+    .rules-section:nth-child(3) { animation-delay: 0.1s; }
+    .rules-section:nth-child(4) { animation-delay: 0.15s; }
+    .rules-section:nth-child(5) { animation-delay: 0.2s; }
+    .rules-section:nth-child(6) { animation-delay: 0.25s; }
+    .rules-section:nth-child(7) { animation-delay: 0.3s; }
+    .rules-section:nth-child(8) { animation-delay: 0.35s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: var(--accent);
+      min-width: 36px;
+      line-height: 1;
+    }
+
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--text-primary);
+    }
+
+    .section-badge {
+      margin-left: auto;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 2px;
+      font-weight: 500;
+    }
+
+    .badge-critical {
+      color: var(--red);
+      background: var(--red-dim);
+      border: 1px solid var(--red-dim);
+    }
+
+    .badge-important {
+      color: var(--orange);
+      background: var(--orange-dim);
+      border: 1px solid var(--orange-dim);
+    }
+
+    .badge-info {
+      color: var(--blue);
+      background: var(--blue-dim);
+      border: 1px solid var(--blue-dim);
+    }
+
+    .badge-govern {
+      color: var(--purple);
+      background: var(--purple-dim);
+      border: 1px solid var(--purple-dim);
+    }
+
+    /* ── Rule Items ── */
+    .rules-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rule-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .rule-item:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+    }
+
+    .rule-bullet {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      min-width: 24px;
+      padding-top: 2px;
+    }
+
+    .rule-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    .rule-text strong {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .rule-text .highlight {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* ── Callout Box ── */
+    .callout {
+      margin-top: 12px;
+      padding: 14px 18px;
+      background: var(--accent-glow);
+      border-left: 2px solid var(--accent);
+      border-radius: 0 4px 4px 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-family: 'IBM Plex Mono', monospace;
+      line-height: 1.6;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 64px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .footer p {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .discord-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 10px 20px;
+      border: 1px solid var(--accent-dim);
+      border-radius: 2px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .discord-link:hover {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+    }
+
+    .discord-link svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--accent);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .container { padding: 40px 16px 80px; }
+      .section-badge { display: none; }
+      .rule-item { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="server-tag">s&box darkrp</div>
+      <h1>THE <span>COLLECTIVE</span></h1>
+      <div class="header-sub">Server Rules &amp; Guidelines</div>
+    </div>
+
+    <!-- 01 — General Conduct -->
+    <div class="rules-section">
+      <div class="section-header">
+        <div class="section-number">01</div>
+        <div class="section-title">General Conduct</div>
+        <div class="section-badge badge-critical">Zero Tolerance</div>
+      </div>
+      <ul class="rules-list">
+        <li class="rule-item">
+          <span class="rule-bullet">1.1</span>
+          <span class="rule-text"><strong>Respect all players.</strong> Harassment, discrimination, hate speech, and toxicity will result in an immediate and permanent ban.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">1.2</span>
+          <span class="rule-text"><strong>No slurs or offensive language.</strong> Filtered words are filtered for a reason. Attempting to bypass the word filter is a bannable offense.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">1.3</span>
+          <span class="rule-text"><strong>No mic spam or chat spam.</strong> This includes playing music through your mic, repeated messages, or excessive use of TTS chat.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">1.4</span>
+          <span class="rule-text"><strong>Listen to staff.</strong> Staff decisions are final in-game. If you believe a decision was wrong, appeal on Discord — do not argue in-game.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">1.5</span>
+          <span class="rule-text"><strong>No advertising.</strong> Do not advertise other servers, communities, or services.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">1.6</span>
+          <span class="rule-text"><strong>English in public chats.</strong> Use English in OOC and advert. Other languages are fine in local/private RP.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 02 — Roleplay Standards -->
+    <div class="rules-section">
+      <div class="section-header">
+        <div class="section-number">02</div>
+        <div class="section-title">Roleplay Standards</div>
+        <div class="section-badge badge-important">Core RP</div>
+      </div>
+      <ul class="rules-list">
+        <li class="rule-item">
+          <span class="rule-bullet">2.1</span>
+          <span class="rule-text"><strong>Random Deathmatch (RDM) is prohibited.</strong> You must have a valid roleplay reason to kill another player. Self-defense, raids, hits, and muggings with proper initiation are valid.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">2.2</span>
+          <span class="rule-text"><strong>New Life Rule (NLR).</strong> After dying, you forget everything from your previous life. Do not return to the area of your death or seek revenge for <span class="highlight">5 minutes</span>.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">2.3</span>
+          <span class="rule-text"><strong>Fear RP.</strong> Value your life. If you are outnumbered or held at gunpoint, comply with reasonable demands unless you have a clear opportunity to escape.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">2.4</span>
+          <span class="rule-text"><strong>No metagaming.</strong> Do not use out-of-character information (Discord calls, stream sniping, OOC chat) to gain an in-character advantage.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">2.5</span>
+          <span class="rule-text"><strong>No FailRP.</strong> Play your role realistically. A police officer should not commit crimes. A medic should not refuse to heal. Stay in character.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">2.6</span>
+          <span class="rule-text"><strong>RP names are required.</strong> Use a realistic or creative roleplay name (max <span class="highlight">24 characters</span>). No offensive, meme, or famous person names.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 03 — Raiding & Criminal Activity -->
+    <div class="rules-section">
+      <div class="section-header">
+        <div class="section-number">03</div>
+        <div class="section-title">Raiding &amp; Criminal Activity</div>
+        <div class="section-badge badge-important">Combat</div>
+      </div>
+      <ul class="rules-list">
+        <li class="rule-item">
+          <span class="rule-bullet">3.1</span>
+          <span class="rule-text"><strong>Raiding cooldowns.</strong> You may raid the same base once every <span class="highlight">15 minutes</span>. You may not raid the same player more than twice per hour.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">3.2</span>
+          <span class="rule-text"><strong>Announce raids.</strong> You must use <span class="highlight">/advert Raid</span> before initiating a raid. Counter-raids do not require adverts.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">3.3</span>
+          <span class="rule-text"><strong>Mugging rules.</strong> You must give victims at least <span class="highlight">10 seconds</span> to comply. Maximum mug amount is <span class="highlight">$5,000</span>. You must face your target.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">3.4</span>
+          <span class="rule-text"><strong>No revenge killing.</strong> NLR applies. If you died during a raid, you cannot return to defend or attack.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">3.5</span>
+          <span class="rule-text"><strong>Hitman rules.</strong> Hits require a valid reason. Hit prices range from <span class="highlight">$300 – $25,000</span>. You have <span class="highlight">20 minutes</span> to complete a hit once accepted.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">3.6</span>
+          <span class="rule-text"><strong>Bank raids.</strong> Bank raids are high-risk events. Police may use lethal force. 12.5% of stolen funds are lost on raid completion.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 04 — Building & Props -->
+    <div class="rules-section">
+      <div class="section-header">
+        <div class="section-number">04</div>
+        <div class="section-title">Building &amp; Props</div>
+        <div class="section-badge badge-info">Building</div>
+      </div>
+      <ul class="rules-list">
+        <li class="rule-item">
+          <span class="rule-bullet">4.1</span>
+          <span class="rule-text"><strong>Prop limit is <span class="highlight">100</span>.</strong> Build responsibly. Excessive or intentionally laggy builds will be removed.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">4.2</span>
+          <span class="rule-text"><strong>No prop abuse.</strong> Prop climbing, prop killing, prop surfing, prop blocking, and prop spamming are all prohibited.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">4.3</span>
+          <span class="rule-text"><strong>Bases must be raidable.</strong> Every base must have a clear entrance. No invisible props, maze bases, or crouch-only entrances that require pixel-perfect movement.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">4.4</span>
+          <span class="rule-text"><strong>Fading doors.</strong> Fading doors must remain open for at least <span class="highlight">1.5 seconds</span>. Max <span class="highlight">3 fading doors</span> per entrance. Fading door abuse is bannable.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">4.5</span>
+          <span class="rule-text"><strong>Building sign.</strong> If you're actively building, put up a text screen. You cannot have valuables (printers, drugs) while building.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">4.6</span>
+          <span class="rule-text"><strong>Door limit: <span class="highlight">10</span>.</strong> Do not buy excessive doors to block off areas you aren't using.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 05 — Government & Law Enforcement -->
+    <div class="rules-section">
+      <div class="section-header">
+        <div class="section-number">05</div>
+        <div class="section-title">Government &amp; Law Enforcement</div>
+        <div class="section-badge badge-govern">Governance</div>
+      </div>
+      <ul class="rules-list">
+        <li class="rule-item">
+          <span class="rule-bullet">5.1</span>
+          <span class="rule-text"><strong>Police must enforce laws fairly.</strong> Do not arrest without cause. Warrants require evidence. Wanted status lasts <span class="highlight">5 minutes</span>.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">5.2</span>
+          <span class="rule-text"><strong>Jail time is <span class="highlight">2 minutes</span>.</strong> Do not extend jail time beyond what the system allows.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">5.3</span>
+          <span class="rule-text"><strong>Mayor laws must be reasonable.</strong> No troll laws. Max <span class="highlight">10 active laws</span>. Laws cannot override server rules.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">5.4</span>
+          <span class="rule-text"><strong>Lockdowns.</strong> Lockdowns require a valid RP reason and last a maximum of <span class="highlight">3 minutes</span>. Cooldown between lockdowns is <span class="highlight">30 minutes</span>.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">5.5</span>
+          <span class="rule-text"><strong>Corruption is not allowed.</strong> Government officials may not participate in criminal activity, accept bribes, or abuse their position.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">5.6</span>
+          <span class="rule-text"><strong>Taxes.</strong> Default tax rate is <span class="highlight">5%</span>, with a max of <span class="highlight">20%</span>. Treasury resets on mayor death.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 06 — AFK & Disconnects -->
+    <div class="rules-section">
+      <div class="section-header">
+        <div class="section-number">06</div>
+        <div class="section-title">AFK &amp; Disconnects</div>
+        <div class="section-badge badge-info">System</div>
+      </div>
+      <ul class="rules-list">
+        <li class="rule-item">
+          <span class="rule-bullet">6.1</span>
+          <span class="rule-text"><strong>AFK players will be demoted</strong> after <span class="highlight">1 hour</span> of inactivity. You will be marked as AFK after 5 minutes.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">6.2</span>
+          <span class="rule-text"><strong>Grace reconnect.</strong> If you disconnect, you have <span class="highlight">8 minutes</span> to reconnect and retain your job, inventory, and props.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">6.3</span>
+          <span class="rule-text"><strong>No AFK farming.</strong> Do not use scripts or methods to avoid the AFK system while earning money passively.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 07 — Exploits & Cheating -->
+    <div class="rules-section">
+      <div class="section-header">
+        <div class="section-number">07</div>
+        <div class="section-title">Exploits &amp; Cheating</div>
+        <div class="section-badge badge-critical">Permanent Ban</div>
+      </div>
+      <ul class="rules-list">
+        <li class="rule-item">
+          <span class="rule-bullet">7.1</span>
+          <span class="rule-text"><strong>No cheats, hacks, or exploits.</strong> Any use of third-party software, scripts, or exploits will result in a permanent ban without appeal.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">7.2</span>
+          <span class="rule-text"><strong>No duplicating money or items.</strong> Exploiting bugs to duplicate is treated the same as cheating.</span>
+        </li>
+        <li class="rule-item">
+          <span class="rule-bullet">7.3</span>
+          <span class="rule-text"><strong>Report exploits.</strong> If you find a bug or exploit, report it to staff immediately. Exploiting a known bug is bannable.</span>
+        </li>
+      </ul>
+      <div class="callout">
+        Staff reserve the right to punish for actions not explicitly listed here. Use common sense. If you have to ask "is this allowed?" — it probably isn't.
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>By playing on The Collective, you agree to follow these rules at all times.</p>
+      <a href="https://discord.gg/ZjfVMA3qHh" target="_blank" rel="noopener" class="discord-link">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.947 2.418-2.157 2.418z"/></svg>
+        Join our Discord
+      </a>
+    </div>
+  </div>
+</body>
+</html>
